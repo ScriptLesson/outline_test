@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hardy–Weinberg Interactive Model</title>
+  <style>
+    :root {
+      --slate-50: #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-500: #64748b;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #0f172a;
+      --white: #ffffff;
+      --sky-50: #f0f9ff;
+      --sky-100: #e0f2fe;
+      --sky-200: #bae6fd;
+      --sky-500: #0ea5e9;
+      --sky-600: #0284c7;
+      --sky-700: #0369a1;
+      --violet-100: #ede9fe;
+      --violet-200: #ddd6fe;
+      --violet-500: #8b5cf6;
+      --violet-800: #5b21b6;
+      --amber-50: #fffbeb;
+      --amber-100: #fef3c7;
+      --amber-200: #fde68a;
+      --amber-500: #f59e0b;
+      --amber-700: #b45309;
+      --amber-800: #92400e;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08), 0 1px 1px rgba(15, 23, 42, 0.03);
+      --shadow-md: 0 10px 25px rgba(15, 23, 42, 0.08), 0 4px 10px rgba(15, 23, 42, 0.04);
+      --radius-xl: 0.75rem;
+      --radius-2xl: 1rem;
+      --radius-3xl: 1.5rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: var(--slate-50);
+      color: var(--slate-900);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .app {
+      min-height: 100vh;
+      background: var(--slate-50);
+      color: var(--slate-900);
+    }
+
+    .container {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-3xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .section-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-3xl);
+      box-shadow: var(--shadow-sm);
+      padding: 1.25rem;
+    }
+
+    .sub-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-sm);
+      padding: 1rem;
+    }
+
+    .hero {
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
+    }
+
+    .hero-top {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      background: var(--sky-100);
+      color: var(--sky-700);
+      border-radius: 999px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 2.25rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--slate-900);
+    }
+
+    h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.125rem;
+      line-height: 1.4;
+      font-weight: 700;
+      color: var(--slate-900);
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .hero p.lead {
+      margin-top: 0.75rem;
+      max-width: 48rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--slate-600);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: flex-end;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary {
+      background: var(--sky-600);
+      color: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 0.7rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: var(--sky-700);
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--slate-700);
+      border: 1px solid var(--slate-300);
+      border-radius: var(--radius-xl);
+      padding: 0.7rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .btn-secondary:hover {
+      background: var(--slate-100);
+    }
+
+    .summary-grid {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .summary-pill {
+      border: 1px solid var(--slate-200);
+      background: var(--slate-50);
+      border-radius: var(--radius-2xl);
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--slate-700);
+    }
+
+    .main-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: 1fr;
+    }
+
+    .left-column,
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .control-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-sm);
+      padding: 1rem;
+    }
+
+    .control-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .control-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--slate-800);
+    }
+
+    .control-help {
+      margin-top: 0.125rem;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      color: var(--slate-500);
+    }
+
+    .value-pill {
+      min-width: 72px;
+      text-align: right;
+      border-radius: 999px;
+      background: var(--slate-100);
+      color: var(--slate-700);
+      padding: 0.25rem 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--sky-600);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      border: 1px solid var(--slate-200);
+      background: var(--white);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-sm);
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .toggle:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .toggle input {
+      margin-top: 0.2rem;
+    }
+
+    .toggle-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--slate-800);
+    }
+
+    .toggle-note {
+      margin-top: 0.125rem;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      color: var(--slate-500);
+    }
+
+    .two-col {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;
+    }
+
+    .mini-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;
+    }
+
+    .info-box {
+      border-radius: var(--radius-2xl);
+      padding: 1rem;
+    }
+
+    .info-box.sky {
+      background: var(--sky-50);
+    }
+
+    .info-box.amber {
+      background: var(--amber-50);
+    }
+
+    .info-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .sky .info-label,
+    .sky .info-sub {
+      color: #0c4a6e;
+    }
+
+    .amber .info-label,
+    .amber .info-sub {
+      color: var(--amber-800);
+    }
+
+    .info-value {
+      margin-top: 0.5rem;
+      font-size: 1.875rem;
+      font-weight: 700;
+    }
+
+    .sky .info-value {
+      color: var(--sky-700);
+    }
+
+    .amber .info-value {
+      color: var(--amber-700);
+    }
+
+    .info-sub {
+      margin-top: 0.25rem;
+      font-size: 0.875rem;
+      opacity: 0.8;
+    }
+
+    .gene-pool {
+      margin-top: 1.25rem;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-2xl);
+      padding: 1rem;
+    }
+
+    .small-title {
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--slate-800);
+    }
+
+    .progress-wrap {
+      height: 1rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--slate-100);
+      margin-bottom: 0.75rem;
+    }
+
+    .progress-bar {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .bg-sky-500 { background: var(--sky-500); }
+    .bg-violet-500 { background: var(--violet-500); }
+    .bg-amber-500 { background: var(--amber-500); }
+
+    .gene-grid {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 0.375rem;
+    }
+
+    .gene-cell {
+      height: 1.5rem;
+      border-radius: 0.5rem;
+    }
+
+    .tiny-note {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      color: var(--slate-500);
+    }
+
+    .equations {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .equation-chip {
+      border-radius: var(--radius-2xl);
+      border: 1px solid var(--slate-200);
+      background: var(--white);
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      color: var(--slate-700);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .equation-chip strong {
+      color: var(--slate-800);
+    }
+
+    .equation-line {
+      margin-top: 0.25rem;
+      color: var(--slate-600);
+      line-height: 1.6;
+    }
+
+    .muted-panel {
+      border-radius: var(--radius-2xl);
+      background: var(--slate-50);
+      padding: 1rem;
+      font-size: 0.875rem;
+      line-height: 1.7;
+      color: var(--slate-600);
+    }
+
+    .muted-panel strong {
+      color: var(--slate-800);
+    }
+
+    .bar-group {
+      border-radius: var(--radius-2xl);
+      border: 1px solid var(--slate-200);
+      background: var(--white);
+      padding: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .bar-title {
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--slate-800);
+    }
+
+    .bar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .bar-row-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.875rem;
+    }
+
+    .bar-row-top .name {
+      font-weight: 500;
+      color: var(--slate-700);
+    }
+
+    .bar-row-top .meta {
+      color: var(--slate-600);
+      text-align: right;
+    }
+
+    .bar-track {
+      height: 0.75rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--slate-100);
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    .section-head {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .inline-pill {
+      display: inline-block;
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--slate-100);
+      color: var(--slate-700);
+      padding: 0.25rem 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .section-description {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--slate-600);
+    }
+
+    .wide-head {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .interpretation-pill {
+      display: inline-block;
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--slate-100);
+      color: var(--slate-700);
+      padding: 0.25rem 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .chart-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-2xl);
+      background: var(--slate-50);
+      padding: 0.75rem;
+    }
+
+    .chart-wrap svg {
+      display: block;
+      width: 100%;
+      min-width: 640px;
+      height: 260px;
+    }
+
+    .population-head {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .population-legend {
+      font-size: 0.875rem;
+      color: var(--slate-500);
+    }
+
+    .population-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+
+    .population-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 3rem;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--slate-200);
+      font-size: 0.875rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s ease;
+    }
+
+    .population-cell:hover {
+      transform: scale(1.03);
+    }
+
+    .geno-AA {
+      border-color: var(--sky-200);
+      background: var(--sky-100);
+      color: var(--sky-700);
+    }
+
+    .geno-Aa {
+      border-color: var(--violet-200);
+      background: var(--violet-100);
+      color: var(--violet-800);
+    }
+
+    .geno-aa {
+      border-color: var(--amber-200);
+      background: var(--amber-100);
+      color: var(--amber-800);
+    }
+
+    .task-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;
+    }
+
+    .task-card {
+      border-radius: var(--radius-2xl);
+      border: 1px solid var(--slate-200);
+      background: var(--white);
+      padding: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .task-title {
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--slate-800);
+    }
+
+    .task-prompt {
+      margin-bottom: 0.75rem;
+      font-size: 0.875rem;
+      line-height: 1.7;
+      color: var(--slate-600);
+    }
+
+    .task-button {
+      background: var(--slate-900);
+      color: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 0.625rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .task-button:hover {
+      background: var(--slate-700);
+    }
+
+    .interpret-text {
+      font-size: 0.875rem;
+      line-height: 1.9;
+      color: var(--slate-600);
+    }
+
+    .interpret-text strong {
+      color: var(--slate-800);
+      font-weight: 600;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        padding: 2rem;
+      }
+
+      .hero {
+        padding: 2rem;
+      }
+
+      .hero-top {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .mini-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .section-head,
+      .wide-head,
+      .population-head {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+
+      .population-grid {
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+      }
+
+      .task-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .two-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .population-grid {
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .main-grid {
+        grid-template-columns: 360px minmax(0, 1fr);
+      }
+
+      .task-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .population-grid {
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="app"></div>
+
+  <script>
+    (function () {
+      const equilibriumPreset = {
+        p: 0.6,
+        populationSize: 1000,
+        generations: 12,
+        inspectGeneration: 0,
+        selectionOn: false,
+        selectionStrength: 0,
+        mutationOn: false,
+        mu: 0,
+        nu: 0,
+        migrationOn: false,
+        migrationRate: 0,
+        migrantP: 0.3,
+        driftOn: false,
+        nonRandomOn: false,
+        inbreeding: 0,
+      };
+
+      const state = {
+        ...equilibriumPreset,
+        driftSeed: 1,
+      };
+
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+      const round = (value, digits = 3) => Number(value.toFixed(digits));
+      const pct = (value) => `${(value * 100).toFixed(1)}%`;
+
+      function mulberry32(seed) {
+        return function () {
+          let t = (seed += 0x6d2b79f5);
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function sampleBinomial(trials, probability, rng) {
+        let successes = 0;
+        for (let i = 0; i < trials; i += 1) {
+          if (rng() < probability) successes += 1;
+        }
+        return successes;
+      }
+
+      function genotypeFromAlleles(p, F) {
+        const q = 1 - p;
+        const inbreeding = F || 0;
+        return {
+          AA: p * p + inbreeding * p * q,
+          Aa: 2 * p * q * (1 - inbreeding),
+          aa: q * q + inbreeding * p * q,
+        };
+      }
+
+      function allocateCounts(freqs, total) {
+        const raw = freqs.map((f) => f * total);
+        const base = raw.map((n) => Math.floor(n));
+        let remainder = total - base.reduce((a, b) => a + b, 0);
+
+        const order = raw
+          .map((value, index) => ({ index, frac: value - Math.floor(value) }))
+          .sort((a, b) => b.frac - a.frac);
+
+        for (let i = 0; i < remainder; i += 1) {
+          base[order[i % order.length].index] += 1;
+        }
+
+        return base;
+      }
+
+      function makePopulationSample(genotypes, total) {
+        const counts = allocateCounts([genotypes.AA, genotypes.Aa, genotypes.aa], total || 60);
+        return [
+          ...Array.from({ length: counts[0] }, () => "AA"),
+          ...Array.from({ length: counts[1] }, () => "Aa"),
+          ...Array.from({ length: counts[2] }, () => "aa"),
+        ];
+      }
+
+      function buildLinePath(points, width, height, yMin, yMax, pad) {
+        const min = yMin == null ? 0 : yMin;
+        const max = yMax == null ? 1 : yMax;
+        const padding = pad == null ? 28 : pad;
+        if (points.length <= 1) return "";
+        const innerW = width - padding * 2;
+        const innerH = height - padding * 2;
+
+        return points
+          .map((y, i) => {
+            const xPos = padding + (i / (points.length - 1 || 1)) * innerW;
+            const yPos = padding + innerH - ((y - min) / (max - min || 1)) * innerH;
+            return `${i === 0 ? "M" : "L"}${xPos},${yPos}`;
+          })
+          .join(" ");
+      }
+
+      function simulate() {
+        const F = state.nonRandomOn ? state.inbreeding : 0;
+        const rng = mulberry32(12345 + state.driftSeed * 9973 + state.populationSize * 17 + state.generations);
+        let currentP = clamp(state.p, 0, 1);
+        const history = [];
+
+        for (let generation = 0; generation <= state.generations; generation += 1) {
+          const currentQ = 1 - currentP;
+          const expected = genotypeFromAlleles(currentP, 0);
+          const matingGenotypes = genotypeFromAlleles(currentP, F);
+
+          let actual = { ...matingGenotypes };
+          if (state.selectionOn) {
+            const fitnessAA = 1;
+            const fitnessAa = 1;
+            const fitnessaa = 1 - state.selectionStrength;
+            const meanFitness =
+              matingGenotypes.AA * fitnessAA +
+              matingGenotypes.Aa * fitnessAa +
+              matingGenotypes.aa * fitnessaa;
+
+            actual = {
+              AA: (matingGenotypes.AA * fitnessAA) / meanFitness,
+              Aa: (matingGenotypes.Aa * fitnessAa) / meanFitness,
+              aa: (matingGenotypes.aa * fitnessaa) / meanFitness,
+            };
+          }
+
+          history.push({ generation, p: currentP, q: currentQ, expected, actual });
+
+          if (generation === state.generations) break;
+
+          let nextP = actual.AA + 0.5 * actual.Aa;
+
+          if (state.mutationOn) {
+            nextP = nextP * (1 - state.mu) + (1 - nextP) * state.nu;
+          }
+
+          if (state.migrationOn) {
+            nextP = (1 - state.migrationRate) * nextP + state.migrationRate * state.migrantP;
+          }
+
+          if (state.driftOn) {
+            const copiesOfA = sampleBinomial(state.populationSize * 2, nextP, rng);
+            nextP = copiesOfA / (state.populationSize * 2);
+          }
+
+          currentP = clamp(nextP, 0, 1);
+        }
+
+        return history;
+      }
+
+      function interpretationText() {
+        if (!state.selectionOn && !state.mutationOn && !state.migrationOn && !state.driftOn && !state.nonRandomOn) {
+          return "Under Hardy–Weinberg equilibrium, allele frequencies stay constant and genotype frequencies match p², 2pq and q² in every generation.";
+        }
+        if (state.selectionOn) {
+          return "Selection changes survival. If aa is selected against, the a allele usually becomes less common over time.";
+        }
+        if (state.mutationOn) {
+          return "Mutation slowly changes allele frequencies by converting one allele into the other.";
+        }
+        if (state.migrationOn) {
+          return "Migration adds alleles from another population, so the local gene pool shifts towards the migrants.";
+        }
+        if (state.driftOn) {
+          return "Genetic drift causes random fluctuations, especially in small populations. A jagged line is a key clue.";
+        }
+        return "Non-random mating changes genotype frequencies first. It often reduces heterozygotes without changing p and q straight away.";
+      }
+
+      function resetEquilibrium() {
+        Object.assign(state, equilibriumPreset);
+        state.driftSeed += 1;
+        render();
+      }
+
+      function loadScenario(scenario) {
+        state.p = scenario.p ?? equilibriumPreset.p;
+        state.populationSize = scenario.populationSize ?? equilibriumPreset.populationSize;
+        state.generations = scenario.generations ?? equilibriumPreset.generations;
+        state.inspectGeneration = scenario.inspectGeneration ?? 0;
+        state.selectionOn = !!scenario.selectionOn;
+        state.selectionStrength = scenario.selectionStrength ?? 0;
+        state.mutationOn = !!scenario.mutationOn;
+        state.mu = scenario.mu ?? 0;
+        state.nu = scenario.nu ?? 0;
+        state.migrationOn = !!scenario.migrationOn;
+        state.migrationRate = scenario.migrationRate ?? 0;
+        state.migrantP = scenario.migrantP ?? equilibriumPreset.migrantP;
+        state.driftOn = !!scenario.driftOn;
+        state.nonRandomOn = !!scenario.nonRandomOn;
+        state.inbreeding = scenario.inbreeding ?? 0;
+        state.driftSeed += 1;
+        render();
+      }
+
+      function createSlider(config) {
+        return `
+          <div class="control-card">
+            <div class="control-head">
+              <div>
+                <div class="control-title">${config.label}</div>
+                <div class="control-help">${config.help}</div>
+              </div>
+              <div class="value-pill">${config.valueLabel}</div>
+            </div>
+            <input
+              type="range"
+              min="${config.min}"
+              max="${config.max}"
+              step="${config.step}"
+              value="${config.value}"
+              data-slider="${config.key}"
+            />
+          </div>
+        `;
+      }
+
+      function createToggle(config) {
+        return `
+          <label class="toggle">
+            <input type="checkbox" data-toggle="${config.key}" ${config.checked ? "checked" : ""} />
+            <div>
+              <div class="toggle-title">${config.label}</div>
+              <div class="toggle-note">${config.note}</div>
+            </div>
+          </label>
+        `;
+      }
+
+      function createBarGroup(title, values, countBase) {
+        const rows = [
+          { key: "AA", label: "AA", value: values.AA, cls: "bg-sky-500" },
+          { key: "Aa", label: "Aa", value: values.Aa, cls: "bg-violet-500" },
+          { key: "aa", label: "aa", value: values.aa, cls: "bg-amber-500" },
+        ];
+
+        return `
+          <div class="bar-group">
+            <div class="bar-title">${title}</div>
+            <div class="bar-list">
+              ${rows.map((row) => `
+                <div>
+                  <div class="bar-row-top">
+                    <span class="name">${row.label}</span>
+                    <span class="meta">${pct(row.value)} • ${Math.round(row.value * countBase)} of ${countBase}</span>
+                  </div>
+                  <div class="bar-track">
+                    <div class="bar-fill ${row.cls}" style="width:${row.value * 100}%"></div>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      }
+
+      function render() {
+        const simulation = simulate();
+        const inspected = simulation[Math.min(state.inspectGeneration, state.generations)] || simulation[0];
+        const populationSample = makePopulationSample(inspected.actual, Math.min(60, state.populationSize));
+        const linePath = buildLinePath(simulation.map((entry) => entry.p), 640, 260, 0, 1, 28);
+        const scenarioSummary = [
+          state.selectionOn ? "selection on" : "no selection",
+          state.mutationOn ? "mutation on" : "no mutation",
+          state.migrationOn ? "migration on" : "no migration",
+          state.driftOn ? "drift on" : "no genetic drift",
+          state.nonRandomOn ? "non-random mating on" : "random mating",
+        ];
+
+        const app = document.getElementById("app");
+        app.innerHTML = `
+          <div class="container">
+            <div class="card hero">
+              <div class="hero-top">
+                <div>
+                  <div class="eyebrow">Hardy–Weinberg interactive model</div>
+                  <h1>See how allele frequencies and genotype frequencies are connected</h1>
+                  <p class="lead">This model starts with the ideal Hardy–Weinberg conditions. Then you can break one assumption at a time and watch what happens to allele frequency, genotype frequency and equilibrium.</p>
+                </div>
+                <div class="button-row">
+                  <button id="reset-equilibrium" class="btn-primary" title="Return to large population, random mating, no mutation, no migration and no selection.">Reset to equilibrium</button>
+                  ${state.driftOn ? `<button id="resample-drift" class="btn-secondary" title="Run the drift scenario again with a new random path.">Re-sample drift</button>` : ""}
+                </div>
+              </div>
+              <div class="summary-grid">
+                ${scenarioSummary.map((item) => `<div class="summary-pill">${item}</div>`).join("")}
+              </div>
+            </div>
+
+            <div class="main-grid">
+              <div class="left-column">
+                <div class="section-card">
+                  <h2>Controls</h2>
+                  <div class="stack">
+                    ${createSlider({
+                      key: "p",
+                      label: "Allele frequency p",
+                      value: state.p,
+                      min: 0,
+                      max: 1,
+                      step: 0.01,
+                      valueLabel: round(state.p, 2),
+                      help: "p is the frequency of allele A in the population. q is automatically calculated as 1 − p.",
+                    })}
+                    ${createSlider({
+                      key: "populationSize",
+                      label: "Population size",
+                      value: state.populationSize,
+                      min: 20,
+                      max: 2000,
+                      step: 10,
+                      valueLabel: state.populationSize,
+                      help: "Larger populations reduce the visible effect of genetic drift.",
+                    })}
+                    ${createSlider({
+                      key: "generations",
+                      label: "Generations to simulate",
+                      value: state.generations,
+                      min: 1,
+                      max: 50,
+                      step: 1,
+                      valueLabel: state.generations,
+                      help: "The graph will show how p changes from generation 0 to the final generation.",
+                    })}
+                    ${createSlider({
+                      key: "inspectGeneration",
+                      label: "Generation to inspect",
+                      value: Math.min(state.inspectGeneration, state.generations),
+                      min: 0,
+                      max: state.generations,
+                      step: 1,
+                      valueLabel: `G${Math.min(state.inspectGeneration, state.generations)}`,
+                      help: "Use this to inspect a particular generation in the bars and population sample below.",
+                    })}
+                  </div>
+                </div>
+
+                <div class="section-card">
+                  <h2>Break one assumption</h2>
+                  <div class="stack">
+                    ${createToggle({
+                      key: "selectionOn",
+                      checked: state.selectionOn,
+                      label: "Natural selection",
+                      note: "Selection against aa changes survival, so allele frequencies can change across generations.",
+                    })}
+                    ${state.selectionOn ? createSlider({
+                      key: "selectionStrength",
+                      label: "Selection against aa",
+                      value: state.selectionStrength,
+                      min: 0,
+                      max: 1,
+                      step: 0.01,
+                      valueLabel: round(state.selectionStrength, 2),
+                      help: "0 means no disadvantage. 1 means aa does not survive to reproduce.",
+                    }) : ""}
+
+                    ${createToggle({
+                      key: "mutationOn",
+                      checked: state.mutationOn,
+                      label: "Mutation",
+                      note: "Mutation changes alleles directly. In this model, A can mutate to a and a can mutate to A.",
+                    })}
+                    ${state.mutationOn ? `
+                      <div class="stack">
+                        ${createSlider({
+                          key: "mu",
+                          label: "A → a mutation rate",
+                          value: state.mu,
+                          min: 0,
+                          max: 0.1,
+                          step: 0.001,
+                          valueLabel: round(state.mu, 3),
+                          help: "Usually small. Mutation often changes frequencies slowly.",
+                        })}
+                        ${createSlider({
+                          key: "nu",
+                          label: "a → A mutation rate",
+                          value: state.nu,
+                          min: 0,
+                          max: 0.1,
+                          step: 0.001,
+                          valueLabel: round(state.nu, 3),
+                          help: "Use this to compare one-way and two-way mutation.",
+                        })}
+                      </div>
+                    ` : ""}
+
+                    ${createToggle({
+                      key: "migrationOn",
+                      checked: state.migrationOn,
+                      label: "Migration",
+                      note: "Migration adds alleles from another population, so the gene pool may shift.",
+                    })}
+                    ${state.migrationOn ? `
+                      <div class="stack">
+                        ${createSlider({
+                          key: "migrationRate",
+                          label: "Migration rate",
+                          value: state.migrationRate,
+                          min: 0,
+                          max: 0.5,
+                          step: 0.01,
+                          valueLabel: round(state.migrationRate, 2),
+                          help: "This is the fraction of the population replaced by migrants each generation.",
+                        })}
+                        ${createSlider({
+                          key: "migrantP",
+                          label: "Allele frequency p in migrants",
+                          value: state.migrantP,
+                          min: 0,
+                          max: 1,
+                          step: 0.01,
+                          valueLabel: round(state.migrantP, 2),
+                          help: "If the migrants have a different allele frequency, your population changes too.",
+                        })}
+                      </div>
+                    ` : ""}
+
+                    ${createToggle({
+                      key: "driftOn",
+                      checked: state.driftOn,
+                      label: "Genetic drift",
+                      note: "Drift is random. Its effect is strongest when population size is small.",
+                    })}
+
+                    ${createToggle({
+                      key: "nonRandomOn",
+                      checked: state.nonRandomOn,
+                      label: "Non-random mating",
+                      note: "This model uses an inbreeding coefficient F, which increases homozygotes and reduces heterozygotes.",
+                    })}
+                    ${state.nonRandomOn ? createSlider({
+                      key: "inbreeding",
+                      label: "Inbreeding coefficient F",
+                      value: state.inbreeding,
+                      min: 0,
+                      max: 1,
+                      step: 0.01,
+                      valueLabel: round(state.inbreeding, 2),
+                      help: "F = 0 gives Hardy–Weinberg proportions. Higher F reduces heterozygotes.",
+                    }) : ""}
+                  </div>
+                </div>
+              </div>
+
+              <div class="right-column">
+                <div class="two-col">
+                  <div class="section-card">
+                    <div class="section-head">
+                      <h2>Allele frequencies</h2>
+                      <div class="inline-pill">Generation ${inspected.generation}</div>
+                    </div>
+                    <div class="mini-grid">
+                      <div class="info-box sky">
+                        <div class="info-label">Allele A</div>
+                        <div class="info-value">p = ${round(inspected.p, 3)}</div>
+                        <div class="info-sub">Frequency of allele A</div>
+                      </div>
+                      <div class="info-box amber">
+                        <div class="info-label">Allele a</div>
+                        <div class="info-value">q = ${round(inspected.q, 3)}</div>
+                        <div class="info-sub">Frequency of allele a</div>
+                      </div>
+                    </div>
+
+                    <div class="gene-pool">
+                      <div class="small-title">Gene pool view</div>
+                      <div class="progress-wrap">
+                        <div class="progress-bar">
+                          <div class="bg-sky-500" style="width:${inspected.p * 100}%"></div>
+                          <div class="bg-amber-500" style="width:${inspected.q * 100}%"></div>
+                        </div>
+                      </div>
+                      <div class="gene-grid">
+                        ${Array.from({ length: 20 }).map((_, i) => `
+                          <div class="gene-cell ${i < Math.round(inspected.p * 20) ? "bg-sky-500" : "bg-amber-500"}" title="${i < Math.round(inspected.p * 20) ? "Allele A" : "Allele a"}"></div>
+                        `).join("")}
+                      </div>
+                      <div class="tiny-note">These blocks show the gene pool. Blue blocks represent A and amber blocks represent a.</div>
+                    </div>
+                  </div>
+
+                  <div class="section-card">
+                    <h2>Live equations</h2>
+                    <div class="equations">
+                      <div class="equation-chip">
+                        <strong>p + q = 1</strong>
+                        <div class="equation-line">${round(inspected.p, 3)} + ${round(inspected.q, 3)} = ${round(inspected.p + inspected.q, 3)}</div>
+                      </div>
+                      <div class="equation-chip">
+                        <strong>Expected Hardy–Weinberg genotype frequencies</strong>
+                        <div class="equation-line">AA = p² = ${round(inspected.expected.AA, 3)} • Aa = 2pq = ${round(inspected.expected.Aa, 3)} • aa = q² = ${round(inspected.expected.aa, 3)}</div>
+                      </div>
+                      <div class="equation-chip">
+                        <strong>Expected total</strong>
+                        <div class="equation-line">p² + 2pq + q² = ${round(inspected.expected.AA + inspected.expected.Aa + inspected.expected.aa, 3)}</div>
+                      </div>
+                      <div class="equation-chip">
+                        <strong>Actual genotype frequencies in this model</strong>
+                        <div class="equation-line">AA = ${round(inspected.actual.AA, 3)} • Aa = ${round(inspected.actual.Aa, 3)} • aa = ${round(inspected.actual.aa, 3)}</div>
+                      </div>
+                    </div>
+                    <div class="muted-panel"><strong>Why this matters:</strong> expected frequencies come from allele frequencies alone. Actual frequencies can differ when assumptions are broken.</div>
+                  </div>
+                </div>
+
+                <div class="two-col">
+                  ${createBarGroup("Expected genotype frequencies from p and q", inspected.expected, state.populationSize)}
+                  ${createBarGroup("Actual genotype frequencies in the population", inspected.actual, state.populationSize)}
+                </div>
+
+                <div class="section-card">
+                  <div class="wide-head">
+                    <div>
+                      <h2>Change in allele frequency across generations</h2>
+                      <p class="section-description">The line shows how p changes from generation 0 to generation ${state.generations}. In equilibrium it should stay flat.</p>
+                    </div>
+                    <div class="interpretation-pill">${interpretationText()}</div>
+                  </div>
+
+                  <div class="chart-wrap">
+                    <svg viewBox="0 0 640 260" aria-label="Allele frequency chart">
+                      ${[0, 0.25, 0.5, 0.75, 1].map((tick) => {
+                        const y = 28 + (1 - tick) * (260 - 56);
+                        return `
+                          <g>
+                            <line x1="28" x2="612" y1="${y}" y2="${y}" stroke="#cbd5e1" stroke-dasharray="4 4"></line>
+                            <text x="8" y="${y + 4}" font-size="12" fill="#475569">${tick.toFixed(2)}</text>
+                          </g>
+                        `;
+                      }).join("")}
+
+                      <line x1="28" x2="28" y1="28" y2="232" stroke="#334155"></line>
+                      <line x1="28" x2="612" y1="232" y2="232" stroke="#334155"></line>
+
+                      ${simulation.map((entry, i) => {
+                        const x = 28 + (i / (simulation.length - 1 || 1)) * (640 - 56);
+                        return `<text x="${x}" y="250" text-anchor="middle" font-size="11" fill="#475569">${entry.generation}</text>`;
+                      }).join("")}
+
+                      <path d="${linePath}" fill="none" stroke="#0284c7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+
+                      ${simulation.map((entry, i) => {
+                        const x = 28 + (i / (simulation.length - 1 || 1)) * (640 - 56);
+                        const y = 28 + (1 - entry.p) * (260 - 56);
+                        return `
+                          <g>
+                            <circle cx="${x}" cy="${y}" r="4.5" fill="#0284c7">
+                              <title>Generation ${entry.generation}: p = ${round(entry.p, 3)}</title>
+                            </circle>
+                          </g>
+                        `;
+                      }).join("")}
+
+                      <text x="320" y="18" text-anchor="middle" font-size="13" fill="#0f172a" font-weight="600">Allele frequency p</text>
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="section-card">
+                  <div class="population-head">
+                    <div>
+                      <h2>Population sample</h2>
+                      <p class="section-description">This sample shows the genotype mix in generation ${inspected.generation}. It uses a display sample of up to 60 individuals.</p>
+                    </div>
+                    <div class="population-legend">AA = blue • Aa = violet • aa = amber</div>
+                  </div>
+                  <div class="population-grid">
+                    ${populationSample.map((genotype) => `
+                      <div class="population-cell geno-${genotype}">${genotype}</div>
+                    `).join("")}
+                  </div>
+                </div>
+
+                <div class="section-card">
+                  <h2>Try this</h2>
+                  <div class="task-grid">
+                    <div class="task-card">
+                      <div class="task-title">Task 1: Pure equilibrium</div>
+                      <div class="task-prompt">Set p = 0.7 under ideal conditions. What genotype frequencies do you expect? Does the line stay flat across generations?</div>
+                      <button class="task-button" data-scenario="equilibrium">Load this scenario</button>
+                    </div>
+                    <div class="task-card">
+                      <div class="task-title">Task 2: Selection against aa</div>
+                      <div class="task-prompt">Turn on selection against aa. Watch what happens to p over several generations. Which allele becomes more common?</div>
+                      <button class="task-button" data-scenario="selection">Load this scenario</button>
+                    </div>
+                    <div class="task-card">
+                      <div class="task-title">Task 3: Genetic drift</div>
+                      <div class="task-prompt">Reduce the population strongly and turn on drift. What pattern in the graph suggests random change rather than directional change?</div>
+                      <button class="task-button" data-scenario="drift">Load this scenario</button>
+                    </div>
+                    <div class="task-card">
+                      <div class="task-title">Task 4: Non-random mating</div>
+                      <div class="task-prompt">Switch on non-random mating. Compare expected and actual genotype frequencies. Which genotype becomes less common first?</div>
+                      <button class="task-button" data-scenario="nonrandom">Load this scenario</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="section-card">
+                  <h2>How to interpret this model</h2>
+                  <p class="interpret-text">Start by comparing the <strong>expected</strong> genotype frequencies with the <strong>actual</strong> genotype frequencies. Under Hardy–Weinberg equilibrium they match, and the allele frequency line stays flat. When you break an assumption, one of two things happens: either the allele frequencies themselves change over time, which means evolution is occurring, or the genotype frequencies move away from Hardy–Weinberg proportions even if p and q stay the same for the moment. The key idea is that allele frequency and genotype frequency are linked, but they are not the same thing.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        bindEvents();
+      }
+
+      function bindEvents() {
+        const resetButton = document.getElementById("reset-equilibrium");
+        if (resetButton) {
+          resetButton.addEventListener("click", resetEquilibrium);
+        }
+
+        const resampleButton = document.getElementById("resample-drift");
+        if (resampleButton) {
+          resampleButton.addEventListener("click", function () {
+            state.driftSeed += 1;
+            render();
+          });
+        }
+
+        document.querySelectorAll("[data-slider]").forEach((input) => {
+          input.addEventListener("input", function (e) {
+            const key = e.target.getAttribute("data-slider");
+            const value = Number(e.target.value);
+            state[key] = value;
+            if (key === "p") state.p = clamp(value, 0, 1);
+            if (key === "generations" && state.inspectGeneration > value) state.inspectGeneration = value;
+            render();
+          });
+        });
+
+        document.querySelectorAll("[data-toggle]").forEach((input) => {
+          input.addEventListener("change", function (e) {
+            const key = e.target.getAttribute("data-toggle");
+            state[key] = e.target.checked;
+            render();
+          });
+        });
+
+        document.querySelectorAll("[data-scenario]").forEach((button) => {
+          button.addEventListener("click", function (e) {
+            const scenario = e.target.getAttribute("data-scenario");
+            if (scenario === "equilibrium") {
+              loadScenario({ p: 0.7, populationSize: 1000, generations: 15, inspectGeneration: 0 });
+            }
+            if (scenario === "selection") {
+              loadScenario({ p: 0.5, populationSize: 1000, generations: 20, inspectGeneration: 20, selectionOn: true, selectionStrength: 0.55 });
+            }
+            if (scenario === "drift") {
+              loadScenario({ p: 0.5, populationSize: 30, generations: 25, inspectGeneration: 25, driftOn: true });
+            }
+            if (scenario === "nonrandom") {
+              loadScenario({ p: 0.5, populationSize: 1000, generations: 8, inspectGeneration: 0, nonRandomOn: true, inbreeding: 0.5 });
+            }
+          });
+        });
+      }
+
+      render();
+    })();
+  </script>
+</body>
+</html>
