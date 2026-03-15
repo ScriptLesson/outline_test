@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Модель для вивчення тригонометричних функцій</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --panel2:#1e293b;
+      --line:#334155;
+      --text:#e5eefc;
+      --muted:#94a3b8;
+      --accent:#38bdf8;
+      --accent2:#22c55e;
+      --accent3:#f59e0b;
+      --danger:#ef4444;
+      --white:#ffffff;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#0b1220,#111827);
+      color:var(--text);
+    }
+
+    .app{
+      max-width:1400px;
+      margin:0 auto;
+      padding:20px;
+    }
+
+    .title{
+      text-align:center;
+      margin-bottom:18px;
+    }
+
+    .title h1{
+      margin:0 0 8px;
+      font-size:32px;
+      color:var(--accent);
+    }
+
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:16px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:18px;
+    }
+
+    .panel{
+      background:rgba(17,24,39,0.92);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 12px 40px rgba(0,0,0,0.28);
+    }
+
+    .controls h2,
+    .visual h2,
+    .graph-panel h2{
+      margin:0 0 14px;
+      font-size:20px;
+      color:#dbeafe;
+    }
+
+    .control-block{
+      margin-bottom:18px;
+      padding:14px;
+      border-radius:14px;
+      background:rgba(30,41,59,0.8);
+      border:1px solid #243246;
+    }
+
+    .control-block label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:700;
+      color:#dbeafe;
+    }
+
+    input[type="range"]{
+      width:100%;
+      cursor:pointer;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    button{
+      background:var(--accent);
+      border:none;
+      color:#062033;
+      font-weight:700;
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      transition:transform .15s ease, opacity .15s ease;
+    }
+
+    button:hover{
+      transform:translateY(-1px);
+      opacity:0.95;
+    }
+
+    button.secondary{
+      background:#cbd5e1;
+      color:#0f172a;
+    }
+
+    button.warn{
+      background:var(--accent3);
+      color:#1f1300;
+    }
+
+    .value-box{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .value{
+      background:#0f172a;
+      border:1px solid #27364d;
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .value .name{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .value .num{
+      font-size:22px;
+      font-weight:700;
+    }
+
+    .value.sin .num{color:var(--accent2)}
+    .value.cos .num{color:var(--accent)}
+    .value.tan .num{color:var(--accent3)}
+    .value.angle .num{color:#fda4af}
+
+    .legend{
+      margin-top:10px;
+      font-size:14px;
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .right-col{
+      display:grid;
+      grid-template-rows:auto auto;
+      gap:18px;
+    }
+
+    .visual canvas,
+    .graph-panel canvas{
+      width:100%;
+      display:block;
+      background:#0b1220;
+      border-radius:14px;
+      border:1px solid #223149;
+    }
+
+    .formula{
+      margin-top:12px;
+      padding:12px;
+      border-radius:14px;
+      background:rgba(15,23,42,0.9);
+      border:1px solid #25354d;
+      color:#dbeafe;
+      line-height:1.6;
+    }
+
+    .formula span{
+      display:inline-block;
+      margin-right:18px;
+    }
+
+    .hint{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    @media (max-width: 1000px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="title">
+      <h1>Модель для вивчення тригонометричних функцій</h1>
+      <p>Досліджуйте кут на одиничному колі та спостерігайте, як змінюються sin, cos і tan.</p>
+    </div>
+
+    <div class="grid">
+      <div class="panel controls">
+        <h2>Керування</h2>
+
+        <div class="control-block">
+          <label for="angleRange">Кут: <span id="angleLabel">45</span>°</label>
+          <input id="angleRange" type="range" min="0" max="360" step="1" value="45">
+          <div class="row">
+            <button data-angle="0">0°</button>
+            <button data-angle="30">30°</button>
+            <button data-angle="45">45°</button>
+            <button data-angle="60">60°</button>
+            <button data-angle="90">90°</button>
+            <button data-angle="180">180°</button>
+          </div>
+        </div>
+
+        <div class="control-block">
+          <label>Анімація</label>
+          <div class="row">
+            <button id="playBtn">▶ Пуск</button>
+            <button id="pauseBtn" class="secondary">⏸ Пауза</button>
+            <button id="resetBtn" class="warn">↺ Скинути</button>
+          </div>
+        </div>
+
+        <div class="control-block">
+          <label>Значення</label>
+          <div class="value-box">
+            <div class="value angle">
+              <div class="name">Кут (радіани)</div>
+              <div class="num" id="radValue">0.7854</div>
+            </div>
+            <div class="value cos">
+              <div class="name">cos(α)</div>
+              <div class="num" id="cosValue">0.7071</div>
+            </div>
+            <div class="value sin">
+              <div class="name">sin(α)</div>
+              <div class="num" id="sinValue">0.7071</div>
+            </div>
+            <div class="value tan">
+              <div class="name">tan(α)</div>
+              <div class="num" id="tanValue">1.0000</div>
+            </div>
+          </div>
+          <div class="legend">
+            <div><strong>Синій</strong> — cos(α)</div>
+            <div><strong>Зелений</strong> — sin(α)</div>
+            <div><strong>Помаранчевий</strong> — tan(α)</div>
+          </div>
+        </div>
+
+        <div class="formula">
+          <span>x = cos(α)</span>
+          <span>y = sin(α)</span>
+          <span>tan(α) = sin(α) / cos(α)</span>
+        </div>
+
+        <div class="hint">
+          Підказка: перетягуйте повзунок або запускайте анімацію, щоб побачити зв’язок між кутом, точкою на колі та графіками функцій.
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="panel visual">
+          <h2>Одиничне коло</h2>
+          <canvas id="circleCanvas" width="900" height="520"></canvas>
+        </div>
+
+        <div class="panel graph-panel">
+          <h2>Графіки sin, cos, tan</h2>
+          <canvas id="graphCanvas" width="900" height="320"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const angleRange = document.getElementById('angleRange');
+    const angleLabel = document.getElementById('angleLabel');
+    const radValue = document.getElementById('radValue');
+    const sinValue = document.getElementById('sinValue');
+    const cosValue = document.getElementById('cosValue');
+    const tanValue = document.getElementById('tanValue');
+
+    const circleCanvas = document.getElementById('circleCanvas');
+    const graphCanvas = document.getElementById('graphCanvas');
+    const cctx = circleCanvas.getContext('2d');
+    const gctx = graphCanvas.getContext('2d');
+
+    const playBtn = document.getElementById('playBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const presetButtons = document.querySelectorAll('[data-angle]');
+
+    let angleDeg = 45;
+    let playing = false;
+    let animationId = null;
+
+    function round4(n){
+      return Math.round(n * 10000) / 10000;
+    }
+
+    function safeTan(s, c){
+      if (Math.abs(c) < 0.00001) return null;
+      return s / c;
+    }
+
+    function updateValues(){
+      const rad = angleDeg * Math.PI / 180;
+      const s = Math.sin(rad);
+      const c = Math.cos(rad);
+      const t = safeTan(s, c);
+
+      angleLabel.textContent = angleDeg;
+      radValue.textContent = round4(rad).toFixed(4);
+      sinValue.textContent = round4(s).toFixed(4);
+      cosValue.textContent = round4(c).toFixed(4);
+      tanValue.textContent = t === null ? 'не існує' : round4(t).toFixed(4);
+    }
+
+    function drawCircleScene(){
+      const w = circleCanvas.width;
+      const h = circleCanvas.height;
+      cctx.clearRect(0, 0, w, h);
+
+      const cx = w * 0.32;
+      const cy = h * 0.55;
+      const r = 170;
+
+      const rad = angleDeg * Math.PI / 180;
+      const x = Math.cos(rad);
+      const y = Math.sin(rad);
+
+      const px = cx + x * r;
+      const py = cy - y * r;
+
+      cctx.fillStyle = '#0b1220';
+      cctx.fillRect(0, 0, w, h);
+
+      // Grid
+      cctx.strokeStyle = 'rgba(100,116,139,0.18)';
+      cctx.lineWidth = 1;
+      for(let gx = 0; gx < w; gx += 40){
+        cctx.beginPath();
+        cctx.moveTo(gx, 0);
+        cctx.lineTo(gx, h);
+        cctx.stroke();
+      }
+      for(let gy = 0; gy < h; gy += 40){
+        cctx.beginPath();
+        cctx.moveTo(0, gy);
+        cctx.lineTo(w, gy);
+        cctx.stroke();
+      }
+
+      // Axes
+      cctx.strokeStyle = '#64748b';
+      cctx.lineWidth = 2;
+      cctx.beginPath();
+      cctx.moveTo(cx - 220, cy);
+      cctx.lineTo(cx + 260, cy);
+      cctx.stroke();
+
+      cctx.beginPath();
+      cctx.moveTo(cx, cy + 220);
+      cctx.lineTo(cx, cy - 220);
+      cctx.stroke();
+
+      // Unit circle
+      cctx.strokeStyle = '#cbd5e1';
+      cctx.lineWidth = 3;
+      cctx.beginPath();
+      cctx.arc(cx, cy, r, 0, Math.PI * 2);
+      cctx.stroke();
+
+      // Radius
+      cctx.strokeStyle = '#f472b6';
+      cctx.lineWidth = 4;
+      cctx.beginPath();
+      cctx.moveTo(cx, cy);
+      cctx.lineTo(px, py);
+      cctx.stroke();
+
+      // cos projection
+      cctx.strokeStyle = '#38bdf8';
+      cctx.lineWidth = 4;
+      cctx.beginPath();
+      cctx.moveTo(cx, cy);
+      cctx.lineTo(px, cy);
+      cctx.stroke();
+
+      // sin projection
+      cctx.strokeStyle = '#22c55e';
+      cctx.lineWidth = 4;
+      cctx.beginPath();
+      cctx.moveTo(px, cy);
+      cctx.lineTo(px, py);
+      cctx.stroke();
+
+      // point
+      cctx.fillStyle = '#ffffff';
+      cctx.beginPath();
+      cctx.arc(px, py, 8, 0, Math.PI * 2);
+      cctx.fill();
+
+      // angle arc
+      cctx.strokeStyle = '#f59e0b';
+      cctx.lineWidth = 4;
+      cctx.beginPath();
+      cctx.arc(cx, cy, 42, 0, -rad, true);
+      cctx.stroke();
+
+      // tangent line x = 1
+      const tx = cx + r;
+      cctx.strokeStyle = 'rgba(245,158,11,0.65)';
+      cctx.lineWidth = 2;
+      cctx.setLineDash([8,8]);
+      cctx.beginPath();
+      cctx.moveTo(tx, cy - 220);
+      cctx.lineTo(tx, cy + 220);
+      cctx.stroke();
+      cctx.setLineDash([]);
+
+      const cos = Math.cos(rad);
+      if (Math.abs(cos) > 0.00001) {
+        const tan = Math.tan(rad);
+        const tpy = cy - tan * r;
+
+        cctx.strokeStyle = '#f59e0b';
+        cctx.lineWidth = 4;
+        cctx.beginPath();
+        cctx.moveTo(tx, cy);
+        cctx.lineTo(tx, tpy);
+        cctx.stroke();
+
+        cctx.fillStyle = '#f59e0b';
+        cctx.beginPath();
+        cctx.arc(tx, tpy, 6, 0, Math.PI * 2);
+        cctx.fill();
+
+        cctx.fillStyle = '#f8fafc';
+        cctx.font = '18px Arial';
+        cctx.fillText('tan(α)', tx + 14, (cy + tpy) / 2);
+      }
+
+      // labels
+      cctx.fillStyle = '#e2e8f0';
+      cctx.font = '18px Arial';
+      cctx.fillText('O', cx - 22, cy + 22);
+      cctx.fillText('1', cx + r - 6, cy + 24);
+      cctx.fillText('x', cx + 245, cy - 10);
+      cctx.fillText('y', cx + 10, cy - 205);
+
+      cctx.fillStyle = '#38bdf8';
+      cctx.fillText('cos(α)', (cx + px) / 2 - 18, cy + 28);
+
+      cctx.fillStyle = '#22c55e';
+      cctx.fillText('sin(α)', px + 10, (cy + py) / 2);
+
+      cctx.fillStyle = '#f472b6';
+      cctx.fillText('r = 1', (cx + px) / 2 - 8, (cy + py) / 2 - 12);
+
+      cctx.fillStyle = '#f59e0b';
+      cctx.fillText('α', cx + 50, cy - 10);
+
+      cctx.fillStyle = '#dbeafe';
+      cctx.font = '20px Arial';
+      cctx.fillText('Координати точки: (' + round4(x).toFixed(4) + '; ' + round4(y).toFixed(4) + ')', w * 0.58, 70);
+
+      cctx.fillStyle = '#94a3b8';
+      cctx.font = '17px Arial';
+      cctx.fillText('На одиничному колі x = cos(α), y = sin(α)', w * 0.58, 105);
+
+      // Explanation box
+      cctx.fillStyle = 'rgba(15,23,42,0.95)';
+      cctx.strokeStyle = '#24364f';
+      cctx.lineWidth = 1.5;
+      roundRect(cctx, w * 0.56, 140, 280, 190, 16, true, true);
+
+      cctx.fillStyle = '#e5eefc';
+      cctx.font = '18px Arial';
+      cctx.fillText('Поточні значення', w * 0.58, 170);
+
+      cctx.fillStyle = '#38bdf8';
+      cctx.fillText('cos(α) = ' + round4(Math.cos(rad)).toFixed(4), w * 0.58, 208);
+
+      cctx.fillStyle = '#22c55e';
+      cctx.fillText('sin(α) = ' + round4(Math.sin(rad)).toFixed(4), w * 0.58, 244);
+
+      cctx.fillStyle = '#f59e0b';
+      const tan = safeTan(Math.sin(rad), Math.cos(rad));
+      cctx.fillText('tan(α) = ' + (tan === null ? 'не існує' : round4(tan).toFixed(4)), w * 0.58, 280);
+
+      cctx.fillStyle = '#cbd5e1';
+      cctx.fillText('Кут α = ' + angleDeg + '°', w * 0.58, 316);
+    }
+
+    function roundRect(ctx, x, y, w, h, r, fill, stroke){
+      if (w < 2 * r) r = w / 2;
+      if (h < 2 * r) r = h / 2;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function drawGraphPanel(){
+      const w = graphCanvas.width;
+      const h = graphCanvas.height;
+      gctx.clearRect(0, 0, w, h);
+      gctx.fillStyle = '#0b1220';
+      gctx.fillRect(0, 0, w, h);
+
+      const margin = {left:60, right:20, top:20, bottom:40};
+      const gw = w - margin.left - margin.right;
+      const gh = h - margin.top - margin.bottom;
+
+      function mapX(deg){
+        return margin.left + (deg / 360) * gw;
+      }
+
+      function mapY(val){
+        return margin.top + gh/2 - val * (gh/2 - 12);
+      }
+
+      // Grid
+      gctx.strokeStyle = 'rgba(100,116,139,0.18)';
+      gctx.lineWidth = 1;
+      for(let d=0; d<=360; d+=30){
+        const x = mapX(d);
+        gctx.beginPath();
+        gctx.moveTo(x, margin.top);
+        gctx.lineTo(x, margin.top + gh);
+        gctx.stroke();
+      }
+      for(let v=-1; v<=1; v+=0.5){
+        const y = mapY(v);
+        gctx.beginPath();
+        gctx.moveTo(margin.left, y);
+        gctx.lineTo(margin.left + gw, y);
+        gctx.stroke();
+      }
+
+      // Axes
+      gctx.strokeStyle = '#94a3b8';
+      gctx.lineWidth = 2;
+      gctx.beginPath();
+      gctx.moveTo(margin.left, mapY(0));
+      gctx.lineTo(margin.left + gw, mapY(0));
+      gctx.stroke();
+
+      gctx.beginPath();
+      gctx.moveTo(margin.left, margin.top);
+      gctx.lineTo(margin.left, margin.top + gh);
+      gctx.stroke();
+
+      // sin
+      drawCurve((deg)=>Math.sin(deg*Math.PI/180), '#22c55e');
+
+      // cos
+      drawCurve((deg)=>Math.cos(deg*Math.PI/180), '#38bdf8');
+
+      // tan, clipped
+      gctx.strokeStyle = '#f59e0b';
+      gctx.lineWidth = 3;
+      gctx.beginPath();
+      let started = false;
+      for(let deg = 0; deg <= 360; deg += 1){
+        const rad = deg * Math.PI / 180;
+        const cos = Math.cos(rad);
+        if (Math.abs(cos) < 0.03){
+          started = false;
+          continue;
+        }
+        const val = Math.tan(rad);
+        if (Math.abs(val) > 3){
+          started = false;
+          continue;
+        }
+        const x = mapX(deg);
+        const y = mapY(val / 3);
+        if (!started){
+          gctx.moveTo(x, y);
+          started = true;
+        } else {
+          gctx.lineTo(x, y);
+        }
+      }
+      gctx.stroke();
+
+      // Current angle line
+      const currentX = mapX(angleDeg);
+      gctx.strokeStyle = '#f472b6';
+      gctx.lineWidth = 2;
+      gctx.setLineDash([7,7]);
+      gctx.beginPath();
+      gctx.moveTo(currentX, margin.top);
+      gctx.lineTo(currentX, margin.top + gh);
+      gctx.stroke();
+      gctx.setLineDash([]);
+
+      // Points on sin and cos
+      const rad = angleDeg * Math.PI / 180;
+      const sinY = mapY(Math.sin(rad));
+      const cosY = mapY(Math.cos(rad));
+      const cos = Math.cos(rad);
+      const tan = Math.abs(cos) < 0.03 ? null : Math.tan(rad);
+      const tanY = tan === null || Math.abs(tan) > 3 ? null : mapY(tan / 3);
+
+      point(currentX, sinY, '#22c55e');
+      point(currentX, cosY, '#38bdf8');
+      if(tanY !== null) point(currentX, tanY, '#f59e0b');
+
+      // Labels
+      gctx.fillStyle = '#cbd5e1';
+      gctx.font = '14px Arial';
+      for(let d=0; d<=360; d+=30){
+        const x = mapX(d);
+        gctx.fillText(String(d) + '°', x - 12, h - 12);
+      }
+
+      gctx.fillText('1', 28, mapY(1)+5);
+      gctx.fillText('0', 28, mapY(0)+5);
+      gctx.fillText('-1', 22, mapY(-1)+5);
+
+      gctx.fillStyle = '#22c55e';
+      gctx.fillText('sin', w - 160, 28);
+      gctx.fillStyle = '#38bdf8';
+      gctx.fillText('cos', w - 120, 28);
+      gctx.fillStyle = '#f59e0b';
+      gctx.fillText('tan', w - 80, 28);
+
+      gctx.fillStyle = '#94a3b8';
+      gctx.fillText('Для tan масштаб зменшено у 3 рази', w - 260, h - 14);
+
+      function drawCurve(fn, color){
+        gctx.strokeStyle = color;
+        gctx.lineWidth = 3;
+        gctx.beginPath();
+        for(let deg=0; deg<=360; deg+=1){
+          const x = mapX(deg);
+          const y = mapY(fn(deg));
+          if(deg === 0) gctx.moveTo(x,y);
+          else gctx.lineTo(x,y);
+        }
+        gctx.stroke();
+      }
+
+      function point(x, y, color){
+        gctx.fillStyle = color;
+        gctx.beginPath();
+        gctx.arc(x, y, 5, 0, Math.PI*2);
+        gctx.fill();
+      }
+    }
+
+    function render(){
+      updateValues();
+      drawCircleScene();
+      drawGraphPanel();
+    }
+
+    angleRange.addEventListener('input', () => {
+      angleDeg = Number(angleRange.value);
+      render();
+    });
+
+    presetButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        angleDeg = Number(btn.dataset.angle);
+        angleRange.value = angleDeg;
+        render();
+      });
+    });
+
+    function animate(){
+      if(!playing) return;
+      angleDeg += 1;
+      if(angleDeg > 360) angleDeg = 0;
+      angleRange.value = angleDeg;
+      render();
+      animationId = requestAnimationFrame(animate);
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (playing) return;
+      playing = true;
+      animate();
+    });
+
+    pauseBtn.addEventListener('click', () => {
+      playing = false;
+      if(animationId) cancelAnimationFrame(animationId);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      playing = false;
+      if(animationId) cancelAnimationFrame(animationId);
+      angleDeg = 45;
+      angleRange.value = angleDeg;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
